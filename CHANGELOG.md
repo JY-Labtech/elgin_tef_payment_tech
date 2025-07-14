@@ -1,3 +1,9 @@
+## 1.0.6
+
+- Primeiro release do Plugin.
+- Funções: cŕedito, crédito parcelado, débito, pix, voucher, ativar terminal.
+- Update dart sdk
+
 ## 1.0.5
 
 - Primeiro release do Plugin.
