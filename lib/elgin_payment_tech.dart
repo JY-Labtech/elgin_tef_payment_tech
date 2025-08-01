@@ -8,9 +8,12 @@ export 'payments/model/elgin_response.dart';
 export 'payments/model/elgin_transaction_response.dart';
 
 class ElginPaymentTech {
-  static final ElginPaymentTech _instance = ElginPaymentTech._internal();
+  static ElginPaymentTech? _instance;
 
-  static ElginPaymentTech get instance => _instance;
+  static ElginPaymentTech get instance {
+    _instance ??= ElginPaymentTech._internal();
+    return _instance!;
+  }
 
   Payment? _payment;
   ElginStyle? _elginStyle;
@@ -20,20 +23,6 @@ class ElginPaymentTech {
   ElginPaymentTech._internal();
 
   Future<String> getSerialNumber() async => await _check.getSerialNumber();
-
-  Future<bool> _checkLicence({required String licenceKey}) async {
-    if (licenceKey.isEmpty) return false;
-
-    final licence = _check;
-    final resultLicence = await licence.checkLicence(
-      licenceKey,
-      url: licenceCheck,
-    );
-    if (!resultLicence) {
-      throw Exception('Invalid licence key. Please check your licence key.');
-    }
-    return resultLicence;
-  }
 
   Future<Payment> initPayment({required String licenceKey}) async {
     if (_isPaymentInitialized) return _payment!;

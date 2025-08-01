@@ -20,6 +20,8 @@
 
 [![Github Badge](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white&link=https://github.com/jhonathanqz)](https://github.com/jhonathanqz)
 
+> ⚠️ Plugin não oficial!
+
 ## :dart: Sobre
 
 Plugin Flutter para facilitar integração com o TEF da `Elgin`.
@@ -104,10 +106,6 @@ ElginPaymentTech.instance().payment.reprinterLastTransaction();
 ```
 
 #### Todas as transações iram retornar suas informações na classe `ElginResponse`.
-
-## :memo: License
-
-This project is under license from MIT. For more details, see the [LICENSE](LICENSE.md) file.
 
 </br>
 
