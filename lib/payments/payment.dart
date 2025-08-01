@@ -8,8 +8,11 @@ import 'package:elgin_payment_tech/payments/utils/payment_types.dart';
 final class Payment {
   final MethodChannel channel;
   final String licenceKey;
-  bool _isValidLicence = false;
   final CheckLicenceTech _licence = CheckLicenceTech.instance();
+
+  // Cache da instância criada
+  static Payment? _instance;
+  static bool _isLicenceValidated = false;
 
   Payment._({
     required this.channel,
@@ -21,17 +24,25 @@ final class Payment {
     required MethodChannel channel,
     required String licenceKey,
   }) async {
+    // Se já existe instância e licença validada, retorna ela diretamente
+    if (_instance != null && _isLicenceValidated) {
+      return _instance!;
+    }
+
     final payment = Payment._(
       channel: channel,
       licenceKey: licenceKey,
     );
 
-    final valid = await payment._checkLicence();
-    if (!valid) {
+    _isLicenceValidated = await payment._checkLicence();
+    if (!_isLicenceValidated) {
+      _instance = null; // Reseta a instância se a licença for inválida
+      _isLicenceValidated = false; // Reseta o estado de licença válida
       throw Exception('Invalid licence key. Please check your licence key.');
     }
 
-    payment._isValidLicence = true;
+    _instance = payment; // Armazena a instância criada
+    _isLicenceValidated = true;
     return payment;
   }
 
@@ -44,7 +55,7 @@ final class Payment {
   }
 
   void _ensureLicence() {
-    if (!_isValidLicence) {
+    if (!_isLicenceValidated) {
       throw Exception('Invalid licence key. Please check your licence key.');
     }
   }
