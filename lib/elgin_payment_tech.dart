@@ -7,10 +7,10 @@ import 'payments/style.dart';
 export 'payments/model/elgin_response.dart';
 export 'payments/model/elgin_transaction_response.dart';
 
-class ElginPaymentTech {
+final class ElginPaymentTech {
   static ElginPaymentTech? _instance;
 
-  static ElginPaymentTech get instance {
+  static ElginPaymentTech get I {
     _instance ??= ElginPaymentTech._internal();
     return _instance!;
   }
@@ -24,6 +24,8 @@ class ElginPaymentTech {
 
   Future<String> getSerialNumber() async => await _check.getSerialNumber();
 
+  Future<bool> wipeLicenceCache() async => await _check.wipeLicence();
+
   Future<Payment> initPayment({required String licenceKey}) async {
     if (_isPaymentInitialized) return _payment!;
 
@@ -34,7 +36,10 @@ class ElginPaymentTech {
   Future<ElginStyle> initStyle({required String licenceKey}) async {
     if (_isStyleInitialized) return _elginStyle!;
 
-    _elginStyle = await ElginStyle.create(channel: channel, licenceKey: licenceKey);
+    _elginStyle = await ElginStyle.create(
+      channel: channel,
+      licenceKey: licenceKey,
+    );
     return _elginStyle!;
   }
 

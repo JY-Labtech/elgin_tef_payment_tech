@@ -66,43 +66,43 @@ Para utilizar o plugin, basta chamar alguma de suas funções abaixo:
 Débito
 
 ```dart
-ElginPaymentTech.instance().payment.debitTransaction(value: value);
+ElginPaymentTech.I.payment.debitTransaction(value: value);
 ```
 
 Crédito:
 
 ```dart
-ElginPaymentTech.instance().payment.creditTransaction(value: value);
+ElginPaymentTech.I.payment.creditTransaction(value: value);
 ```
 
 Crédito Parcelado:
 
 ```dart
-ElginPaymentTech.instance().payment.creditParcTransaction(value: value, parc: parc, financ: financ);
+ElginPaymentTech.I.payment.creditParcTransaction(value: value, parc: parc, financ: financ);
 ```
 
 Pix:
 
 ```dart
-ElginPaymentTech.instance().payment.pixTransaction(value: value);
+ElginPaymentTech.I.payment.pixTransaction(value: value);
 ```
 
 Cancelar:
 
 ```dart
-ElginPaymentTech.instance().payment.refoundTransaction(value: value, nsu: nsu, date: date);
+ElginPaymentTech.I.payment.refoundTransaction(value: value, nsu: nsu, date: date);
 ```
 
 Relatório:
 
 ```dart
-ElginPaymentTech.instance().payment.report(nsu: nsu, date: date);
+ElginPaymentTech.I.payment.report(nsu: nsu, date: date);
 ```
 
 Reimprimir:
 
 ```dart
-ElginPaymentTech.instance().payment.reprinterLastTransaction();
+ElginPaymentTech.I.payment.reprinterLastTransaction();
 ```
 
 #### Todas as transações iram retornar suas informações na classe `ElginResponse`.
