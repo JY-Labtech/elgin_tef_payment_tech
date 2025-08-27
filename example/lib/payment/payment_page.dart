@@ -48,31 +48,31 @@ class _PaymentPageState extends State<PaymentPage> {
               ElevatedButton(
                 child: const Text("Débito"),
                 onPressed: () {
-                  ElginPaymentTech.instance.payment.debitTransaction(value: '10.54');
+                  ElginPaymentTech.I.payment.debitTransaction(value: '10.54');
                 },
               ),
               ElevatedButton(
                 child: const Text("Crédito"),
                 onPressed: () {
-                  ElginPaymentTech.instance.payment.creditTransaction(value: '12.34');
+                  ElginPaymentTech.I.payment.creditTransaction(value: '12.34');
                 },
               ),
               ElevatedButton(
                 child: const Text("Crédito Parc- 2"),
                 onPressed: () {
-                  ElginPaymentTech.instance.payment.creditParcTransaction(value: '98.30', parc: '2', financ: '1');
+                  ElginPaymentTech.I.payment.creditParcTransaction(value: '98.30', parc: '2', financ: '1');
                 },
               ),
               ElevatedButton(
                 child: const Text("Voucher"),
                 onPressed: () {
-                  ElginPaymentTech.instance.payment.debitTransaction(value: '10.54');
+                  ElginPaymentTech.I.payment.debitTransaction(value: '10.54');
                 },
               ),
               ElevatedButton(
                 child: const Text("ATIVAR PINPAD"),
                 onPressed: () async {
-                  ElginPaymentTech.instance.payment.activeTerminal(companyDocument: 'CNPJ da empresa');
+                  ElginPaymentTech.I.payment.activeTerminal(companyDocument: 'CNPJ da empresa');
                 },
               ),
             ],

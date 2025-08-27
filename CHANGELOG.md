@@ -1,3 +1,8 @@
+## 1.1.1
+
+- Corrige bug ao validar licença
+- Adiciona método para limpar cache de licença
+
 ## 1.1.0
 
 - Corrige bug ao validar licença
