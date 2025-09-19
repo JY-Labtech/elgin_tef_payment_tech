@@ -5,8 +5,11 @@ import android.content.Context;
 import android.util.Log;
 
 
+import br.com.jylabtech.elgin_payment_tech.licence.CheckLicenceTech;
+import br.com.jylabtech.elgin_payment_tech.licence.LicenceResult;
 import br.com.jylabtech.elgin_payment_tech.presenter.PaymentsPresenter;
 import br.com.jylabtech.elgin_payment_tech.presenter.StylePresenter;
+import br.com.jylabtech.elgin_payment_tech.BuildConfig;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -41,13 +44,23 @@ public class ElginPaymentTech {
     final Context currentContext;
     private Activity mActivity;
 
+    private CheckLicenceTech licenceTech;
+
     public ElginPaymentTech(Context context, MethodChannel channel, Activity activity) {
         this.currentContext = context;
         this.mChannel = channel;
         this.mActivity = activity;
+        this.licenceTech = new CheckLicenceTech(context);
     }
 
-    public void initPayment(MethodCall call, MethodChannel.Result result) {
+    public void initPayment(MethodCall call, MethodChannel.Result result) throws Exception {
+        String licenceKeyLocal = BuildConfig.LICENCE_KEY;
+        String licenceInternalKey = BuildConfig.LICENCE_INTERNAL_KEY;
+
+        LicenceResult licenceResult = checkValidLicence(licenceKeyLocal, licenceInternalKey);
+        if(licenceResult.getResult() != 0) {
+            throw new Exception(licenceResult.getErrorMessage());
+        }
         if (this.payment == null) {
             this.payment = new PaymentsPresenter(this.mActivity);
         }
@@ -127,5 +140,20 @@ public class ElginPaymentTech {
         }
 
         result.notImplemented();
+    }
+
+    private boolean isValidLicence() throws Exception {
+        boolean result = licenceTech.validateExistsLicence();
+        if(result) {
+            return true;
+        }
+
+        throw new Exception("Licença inválida ou não foi inicializada!");
+    }
+
+    private LicenceResult checkValidLicence(String licenceKey, String licenceInternalKey)  {
+        LicenceResult resultLicence =  licenceTech.validateLicence(licenceKey, licenceInternalKey);
+        return resultLicence;
+
     }
 }
