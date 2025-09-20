@@ -1,6 +1,6 @@
 name: elgin_payment_tech
 description: Plugin Flutter para integrar sua aplicação com o SDK Android da Elgin para meios de pagamento.
-version: 2.0.0
+version: 2.0.0+1
 repository: https://github.com/JY-Labtech/elgin_tef_payment_tech
 
 environment:
