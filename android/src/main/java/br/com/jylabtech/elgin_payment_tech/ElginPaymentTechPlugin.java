@@ -105,10 +105,16 @@ public class ElginPaymentTechPlugin
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
     _result = result;
-    checkElginPaymentTech();
-    if(elginPayment != null) {
-      elginPayment.initPayment(call, result);
-    } 
+    try {
+        checkElginPaymentTech();
+        if(elginPayment != null) {
+            elginPayment.initPayment(call, result);
+        }
+    } catch (Exception e) {
+        Log.d("print", e.getMessage());
+        _result.success(e.getMessage());
+        throw new RuntimeException(e);
+    }
   }
   
   @Override
