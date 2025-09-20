@@ -1,4 +1,3 @@
-import 'package:check_licence_tech/check_licence_tech.dart';
 import 'package:elgin_payment_tech/payments/payment.dart';
 
 import 'licence/constants/licence_constants.dart';
@@ -18,27 +17,20 @@ final class ElginPaymentTech {
   Payment? _payment;
   ElginStyle? _elginStyle;
 
-  final _check = CheckLicenceTech.instance();
-
   ElginPaymentTech._internal();
 
-  Future<String> getSerialNumber() async => await _check.getSerialNumber();
-
-  Future<bool> wipeLicenceCache() async => await _check.wipeLicence();
-
-  Future<Payment> initPayment({required String licenceKey}) async {
+  Payment initPayment() {
     if (_isPaymentInitialized) return _payment!;
 
-    _payment = await Payment.create(channel: channel, licenceKey: licenceKey);
+    _payment = Payment.create(channel: channel);
     return _payment!;
   }
 
-  Future<ElginStyle> initStyle({required String licenceKey}) async {
+  ElginStyle initStyle() {
     if (_isStyleInitialized) return _elginStyle!;
 
-    _elginStyle = await ElginStyle.create(
+    _elginStyle = ElginStyle.create(
       channel: channel,
-      licenceKey: licenceKey,
     );
     return _elginStyle!;
   }
