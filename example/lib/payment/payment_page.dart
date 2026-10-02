@@ -15,6 +15,8 @@ class _PaymentPageState extends State<PaymentPage> {
   @override
   void initState() {
     super.initState();
+    // A licença é lida do android/local.properties (licenceKey / licenceInternalKey).
+    ElginPaymentTech.I.initPayment();
   }
 
   @override

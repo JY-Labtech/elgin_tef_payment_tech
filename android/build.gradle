@@ -19,12 +19,9 @@ buildscript {
             throw new GradleException("LicenceKey não encontrado!!")
         }
 
-        if (!licenceInternalKey || licenceInternalKey == "") {
-            throw new GradleException("LicenceInternalKey não encontrado!!")
-        }
+        // licenceInternalKey é opcional: vazio ou fora do servidor oficial, o plugin usa
+        // https://licence-server.invalid/pos-payments/licence/check (LicenceConfig.resolveLicenceUrl).
 
-        println "licenceKey: $licenceKey"
-        println "licenceInternalKey: $licenceInternalKey"
     }
 
     repositories {
@@ -49,7 +46,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 31
+    if (project.android.hasProperty("namespace")) {
+        namespace 'br.com.jylabtech.elgin_payment_tech'
+    }
+    compileSdkVersion 36
     buildToolsVersion '28.0.3'
 
     buildFeatures {
@@ -101,6 +101,11 @@ dependencies{
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
 
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+
+    // Testes JVM da validação de licença (./gradlew :elgin_payment_tech:testDebugUnitTest)
+    testImplementation 'junit:junit:4.13.2'
+    // org.json do android.jar é stub em testes JVM
+    testImplementation 'org.json:json:20240303'
 
     // Dependencias para módulo de licença (sem kapt)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")

@@ -14,6 +14,10 @@ import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 import br.com.jylabtech.elgin_payment_tech.core.ElginPaymentTech;
+import br.com.jylabtech.elgin_payment_tech.core.PendingOperation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -23,7 +27,6 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.PluginRegistry;
 
@@ -38,7 +41,8 @@ public class ElginPaymentTechPlugin
   private Activity activity;
   private ElginPaymentTech elginPayment;
 
-  public static MethodChannel.Result _result;
+  /** Result da operação em andamento: uma por vez, respondida uma única vez. */
+  final PendingOperation pendingOperation = new PendingOperation();
 
   private int startModalidade;
 
@@ -89,6 +93,8 @@ public class ElginPaymentTechPlugin
   @Override
   public void onDetachedFromActivityForConfigChanges() {
     this.activity = null;
+    // Recria com a nova Activity no próximo uso (a operação pendente continua aguardando o resultado).
+    this.elginPayment = null;
   }
 
   @Override
@@ -100,25 +106,43 @@ public class ElginPaymentTechPlugin
   @Override
   public void onDetachedFromActivity() {
     this.activity = null;
+    this.elginPayment = null;
+    pendingOperation.error(ElginPaymentTech.ELGIN_ERROR, "Activity encerrada antes da resposta do Elgin IDH.", null);
   }
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-    _result = result;
+    if (!ElginPaymentTech.isKnownMethod(call.method)) {
+        result.notImplemented();
+        return;
+    }
+
+    // O TEF processa uma operação por vez: recusa uma nova enquanto outra aguarda resposta,
+    // sem afetar a chamada em andamento.
+    final Result operationResult = pendingOperation.start(result);
+    if (operationResult == null) {
+        result.error(PendingOperation.ELGIN_BUSY, PendingOperation.BUSY_MESSAGE, null);
+        return;
+    }
+
     try {
         checkElginPaymentTech();
         if(elginPayment != null) {
-            elginPayment.initPayment(call, result);
+            // A licença é validada dentro de initPayment antes de qualquer operação.
+            // Licença inválida responde PlatformException(code: 'LICENCE_ERROR').
+            elginPayment.initPayment(call, operationResult);
+        } else {
+            operationResult.error(ElginPaymentTech.ELGIN_ERROR, "Plugin Elgin não está pronto (Activity não anexada).", null);
         }
     } catch (Exception e) {
-        Log.d("print", e.getMessage());
-        _result.success(e.getMessage());
-        throw new RuntimeException(e);
+        Log.e("ElginPaymentTechPlugin", "Erro em " + call.method, e);
+        operationResult.error(ElginPaymentTech.ELGIN_ERROR, e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName(), null);
     }
   }
   
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+    pendingOperation.error(ElginPaymentTech.ELGIN_ERROR, "Plugin desanexado antes da resposta do Elgin IDH.", null);
     channel.setMethodCallHandler(null);
     channel = null;
     mChannelNotification = null;
@@ -140,69 +164,52 @@ public class ElginPaymentTechPlugin
 
   @Override
   public boolean onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        checkTefResponse();
-
         if(requestCode == RequestCode.PERFORM_ELGIN_STYLE) {
-            _result.success(true);
+            pendingOperation.success(true);
+            return true;
         }
+
         if(requestCode == RequestCode.PERFORM_TRANSACTION_ELGIN) {
-          try {
-        assert data != null;
-        String retorno = data.getStringExtra("retorno");
-    } catch (Exception e) {
-    
-    }
+            String response = null;
             try {
-            if(data != null ) {
-                respMSitefToJson(data);
-                String json = getGson().toJson(tefResponse);
-                String testeData = data.getDataString();
-                if (data.getStringExtra("retorno").equals("0")) {
-                if (data.getStringExtra("erro") != null) {
-                    String errorElgin = data.getStringExtra("erro");
-                } else {
-                    String elginMessage = data.getStringExtra("mensagem");
-                }
-            } else {
-                String elginMessage = data.getStringExtra("mensagem");
-            }
-                String elginMessage3 = data.getStringExtra("funcao");
-                String elginMessage4 = data.getStringExtra("resultado");
-                String elginMessage5 = data.getStringExtra("CODRESP");
-                
-         
+                if(data != null) {
+                    checkTefResponse();
+                    respMSitefToJson(data);
 
-
-                Bundle extras = data.getExtras();
-            if (extras != null) {
-                for (String key : extras.keySet()) {
-                    Object value = extras.get(key);
-                    String responseElgin = String.valueOf(value);
-                    Log.d("IntentData","****ValueObject: " + responseElgin);
-                    if(responseElgin.contains("funcao")) {
-                        _result.success(responseElgin);
+                    List<String> extraValues = new ArrayList<>();
+                    Bundle extras = data.getExtras();
+                    if (extras != null) {
+                        for (String key : extras.keySet()) {
+                            String responseElgin = String.valueOf(extras.get(key));
+                            Log.d("IntentData","****ValueObject: " + responseElgin);
+                            extraValues.add(responseElgin);
+                        }
                     }
+                    response = PendingOperation.pickTefResponse(extraValues, data.getStringExtra("jsonResp"));
                 }
-            }
-            String jsonResponse = data.getStringExtra("jsonResp");
-            if (jsonResponse != null) {
-                _result.success(jsonResponse);
-            } 
-            }
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e("ElginPaymentTechPlugin", "Erro ao ler resposta do Elgin IDH", e);
             }
 
+            // Sempre responde uma única vez: sem resposta (ex.: cancelado no IDH) vira ELGIN_ERROR.
+            if (response != null) {
+                pendingOperation.success(response);
+            } else {
+                pendingOperation.error(ElginPaymentTech.ELGIN_ERROR,
+                        "Operação cancelada ou sem resposta do Elgin IDH.", null);
+            }
             return true;
         }
 
         if (requestCode == 4713) {
             if (resultCode == RESULT_OK && data != null) {
-                _result.success(data.getStringExtra("jsonResp"));
+                pendingOperation.success(data.getStringExtra("jsonResp"));
                 handlerELgin(data.getStringExtra("jsonResp"));
             } else {
-                _result.notImplemented();
+                pendingOperation.error(ElginPaymentTech.ELGIN_ERROR,
+                        "Operação cancelada ou sem resposta do Elgin IDH.", null);
             }
+            return true;
         }
         return false;
     }
