@@ -120,7 +120,7 @@ Adicione a dependência no `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  elgin_payment_tech: ^2.1.0
+  elgin_payment_tech: ^2.2.0
 ```
 
 Configure a licença no `android/local.properties` (veja [Licenciamento](#-licenciamento)) e inicialize o plugin:
