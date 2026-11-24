@@ -58,7 +58,7 @@ Também é possível usar as variáveis de ambiente `LICENCE_KEY` e `LICENCE_INT
 
 ### Cache offline
 
-Após uma validação bem-sucedida, a licença é guardada no aparelho de forma criptografada e usada sem internet até o vencimento (`expiredAt`), por no máximo **7 dias** sem uma nova consulta ao servidor. Depois disso o aparelho precisa estar online para validar novamente. O cache é descartado se a licença estiver vencida/inativa/cancelada, se o relógio do aparelho estiver antes da data em que o cache foi salvo (mais de 5 minutos) ou se o `licenceKey` mudar. Caches gravados por versões anteriores com o `licenceInternalKey` antigo (Cloud Run) são descartados uma vez e revalidados online no servidor oficial. A consulta ao servidor tem timeout de 15 s e roda fora da thread principal.
+Após uma validação bem-sucedida, a licença é guardada no aparelho de forma criptografada. A primeira operação depois de abrir o app sempre consulta o servidor, e a licença é revalidada a cada **4 horas** de uso. Se o servidor recusar a licença (cliente bloqueado no portal, licença vencida, cancelada ou suspensa, não encontrada, aparelho desativado ou limite de aparelhos), o cache é apagado e as operações falham com `LICENCE_ERROR` na hora. O cache só é usado quando o servidor não responde (sem internet, timeout ou erro 5xx), por no máximo **72 horas** desde a última validação online; depois de uma falha de rede o plugin espera 5 minutos antes de tentar o servidor de novo. Depois disso o aparelho precisa estar online para validar novamente. O cache é descartado se a licença estiver vencida/inativa/cancelada, se o relógio do aparelho estiver antes da data em que o cache foi salvo (mais de 5 minutos) ou se o `licenceKey` mudar. Caches gravados por versões anteriores com o `licenceInternalKey` antigo (Cloud Run) são descartados uma vez e revalidados online no servidor oficial. A consulta ao servidor tem timeout de 15 s e roda fora da thread principal.
 
 ### Erros de licença
 
@@ -90,8 +90,8 @@ Uma resposta 200 com licença vencida, inativa ou cancelada também é recusada.
 - **"Licença não encontrada"**: confira o `licenceKey` no `local.properties` (sem espaços/aspas) e faça um build limpo (`flutter clean`), pois as chaves são gravadas no build.
 - **Limite de aparelhos**: libere ou desative aparelhos antigos no portal, ou adquira mais dispositivos no plano mensal.
 - **Licença vencida/suspensa**: verifique o pagamento/assinatura no portal.
-- **Funciona offline e depois para**: o cache local dura no máximo 7 dias; conecte o aparelho à internet para revalidar.
-- **Erro de conexão**: o aparelho precisa acessar `https://licence-server.invalid` na primeira validação e a cada 7 dias.
+- **Funciona offline e depois para**: o cache local dura no máximo 72 horas; conecte o aparelho à internet para revalidar.
+- **Erro de conexão**: o aparelho precisa acessar `https://licence-server.invalid` ao abrir o app, a cada 4 horas de uso e, no máximo, a cada 72 horas.
 
 ## :sparkles: Funcionalidades
 
