@@ -58,7 +58,7 @@ public class PendingOperationTest {
         RecordingResult second = new RecordingResult();
 
         MethodChannel.Result firstBound = pending.start(first);
-        firstBound.error(ElginPaymentTech.LICENCE_ERROR, "Licença vencida", null);
+        firstBound.error(ElginPaymentTech.ELGIN_ERROR, "Operação cancelada", null);
         assertFalse(pending.isBusy());
 
         assertNotNull(pending.start(second));

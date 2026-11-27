@@ -1,3 +1,4 @@
+// ignore_for_file: constant_identifier_names
 //fixed payment type to call from channel
 enum PaymentTypeCall {
   CREDIT,

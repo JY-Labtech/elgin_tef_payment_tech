@@ -1,6 +1,6 @@
 import 'package:elgin_payment_tech/payments/payment.dart';
 
-import 'licence/constants/licence_constants.dart';
+import 'payments/utils/channel.dart';
 import 'payments/style.dart';
 
 export 'payments/model/elgin_response.dart';
@@ -37,7 +37,7 @@ final class ElginPaymentTech {
 
   Payment get payment {
     if (_payment == null) {
-      throw Exception('Payment não autorizado. Licença inválida.');
+      throw Exception('Payment não inicializado. Chame ElginPaymentTech.I.initPayment() antes.');
     }
     return _payment!;
   }

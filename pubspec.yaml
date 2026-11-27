@@ -1,7 +1,15 @@
 name: elgin_payment_tech
-description: Plugin Flutter para integrar sua aplicação com o SDK Android da Elgin para meios de pagamento.
-version: 2.2.0
+description: Flutter plugin for Elgin TEF payments on Android via the Elgin IDH (E1 Digital Hub) app - credit, installments, debit, PIX, refund, reprint, report and pinpad setup.
+version: 3.0.0
+homepage: https://github.com/JY-Labtech/elgin_tef_payment_tech
 repository: https://github.com/JY-Labtech/elgin_tef_payment_tech
+issue_tracker: https://github.com/JY-Labtech/elgin_tef_payment_tech/issues
+topics:
+  - payment
+  - pos
+  - tef
+  - android
+  - brazil
 
 environment:
   sdk: ">=3.0.0 <4.0.0"

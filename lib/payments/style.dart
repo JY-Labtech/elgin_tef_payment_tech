@@ -11,11 +11,11 @@ final class ElginStyle {
     required this.channel,
   });
 
-  /// Factory assíncrono com validação da licença
+  /// Cria (uma única vez) a instância de personalização visual do Elgin IDH.
   static ElginStyle create({
     required MethodChannel channel,
   }) {
-    // Se já existe instância e licença validada, retorna ela diretamente
+    // Se já existe instância, retorna ela diretamente
     if (_instance != null) {
       return _instance!;
     }

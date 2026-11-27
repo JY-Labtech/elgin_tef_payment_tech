@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:elgin_payment_tech/elgin_payment_tech.dart';
-import 'package:elgin_payment_tech/licence/constants/licence_constants.dart';
+import 'package:elgin_payment_tech/payments/utils/channel.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 

@@ -128,8 +128,7 @@ public class ElginPaymentTechPlugin
     try {
         checkElginPaymentTech();
         if(elginPayment != null) {
-            // A licença é validada dentro de initPayment antes de qualquer operação.
-            // Licença inválida responde PlatformException(code: 'LICENCE_ERROR').
+            // Chama o Elgin IDH direto; a resposta chega em onActivityResult.
             elginPayment.initPayment(call, operationResult);
         } else {
             operationResult.error(ElginPaymentTech.ELGIN_ERROR, "Plugin Elgin não está pronto (Activity não anexada).", null);

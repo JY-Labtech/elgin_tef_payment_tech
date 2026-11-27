@@ -44,17 +44,24 @@ class ElginResponse {
     return ElginResponse(
       funcao: json['funcao'] == null ? null : json['funcao'] as String,
       mensagem: json['mensagem'] == null ? null : json['mensagem'] as String,
-      transaction: json['resultado'] == null
-          ? null
-          : (json['resultado'].toString()).contains('{')
-              ? ElginTransactionResponse.fromJson(json['resultado'] as String)
-              : null,
-      resultCode: json['resultCode'] == null
-          ? null
-          : (json['resultCode'].toString()).contains('{')
-              ? null
-              : json['resultado'] as int,
+      transaction: _parseTransaction(json['resultado']),
+      resultCode: _parseResultCode(json['resultCode']),
     );
+  }
+
+  /// `resultado` vem do IDH como texto JSON; em [toMap] é um mapa.
+  static ElginTransactionResponse? _parseTransaction(Object? value) {
+    if (value is Map) return ElginTransactionResponse.fromMap(value.cast<String, Object?>());
+    if (value is String && value.contains('{')) return ElginTransactionResponse.fromJson(value);
+    return null;
+  }
+
+  /// `resultCode` pode vir como número ou texto numérico; qualquer outro valor vira `null`.
+  static int? _parseResultCode(Object? value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString().trim());
   }
 
   factory ElginResponse.fromJson(String value) {

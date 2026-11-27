@@ -1,3 +1,23 @@
+## 3.0.0
+
+- **BREAKING: licença e cobrança removidas.** O plugin não valida mais licença nem consulta nenhum servidor da JY Labtech: cada operação chama o Elgin IDH direto.
+  - O build do Android não exige mais `licenceKey`/`LICENCE_KEY` (`local.properties` ou variável de ambiente) nem `licenceInternalKey`/`LICENCE_INTERNAL_KEY`; o erro `LicenceKey não encontrado!!` deixou de existir. Essas chaves podem ser apagadas do `local.properties` e do CI.
+  - Removido o código de erro `LICENCE_ERROR` (Android e Dart). Os erros possíveis agora são `ELGIN_BUSY` e `ELGIN_ERROR`.
+  - Removida a constante Dart `licenceCheck` e o arquivo `lib/licence/constants/licence_constants.dart` (o `channel`/`CHANNEL_NAME` internos foram para `lib/payments/utils/channel.dart`).
+  - Android: removidas as classes `CheckLicenceTech`, `CheckLicenceEntity`, `LicenceConfig`, `LicenceRules`, `LicenceProvider`, `LicenceResult`, `EncryptedLicenceStorage`, `LicenceStorage`, `LicenceNetwork` e `LicenceClock`, o gate por operação, a thread de validação e os campos `BuildConfig.LICENCE_KEY`/`LICENCE_INTERNAL_KEY`.
+  - Android: removidas as dependências `com.squareup.okhttp3:okhttp` e `androidx.security:security-crypto` (só serviam à licença) e o cache criptografado de licença.
+  - A API Dart pública não muda: `initPayment()`, `initStyle()` e todos os métodos de `payment`/`style` mantêm a mesma assinatura.
+  - Removida a permissão `READ_PHONE_STATE` do `AndroidManifest.xml` do plugin (só a licença a usava, para ler o serial do aparelho). Apps que precisem dela devem declará-la no próprio manifest.
+- **Correção:** `ElginResponse.fromMap` lia `resultCode` da chave `resultado` (lançava `TypeError` quando `resultCode` vinha no JSON). Agora lê `resultCode`, aceitando número ou texto numérico. `fromJson(toJson())` também voltou a funcionar com `transaction` preenchida (`resultado` como mapa).
+- `report(nsu, date)`: conforme a documentação do Elgin IDH, o `relatorio` só recebe o extra `funcao`; `nsu` e `date` continuam no canal, mas não vão ao IDH (documentado no README).
+- **Open source sob a licença MIT** (antes BSD 3-Clause).
+- README reescrito: instalação, configuração Android, referência completa da API, exemplos por operação, erros, testes e migração.
+- `pubspec.yaml`: descrição em inglês, `homepage`, `issue_tracker` e `topics`.
+- Mantidos a operação única (`ELGIN_BUSY`) e a resposta única por chamada; as operações passam a abrir o IDH na hora, na main thread (sem a etapa assíncrona da licença).
+- Mensagem de `ElginPaymentTech.I.payment` antes do `initPayment()` agora diz que o plugin não foi inicializado.
+- Testes: removidos os testes de licença; novos testes de `ElginResponse.resultCode`; novos testes Dart de todos os métodos de `payment`/`style` (nome do método, argumentos, resposta e erro) e testes JVM que confirmam que cada método abre o Elgin IDH direto.
+- Example: sem `LICENCE_KEY`; mostra o resultado/erro de cada operação.
+
 ## 2.2.0
 
 - Licença conforme o contrato do jylabtech_core (JYN-234): o cache offline vale por no máximo 72 horas (antes 7 dias) e só é usado quando o servidor não responde (sem internet, timeout, 5xx).

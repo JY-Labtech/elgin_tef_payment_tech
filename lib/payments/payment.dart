@@ -13,11 +13,11 @@ final class Payment {
     required this.channel,
   });
 
-  /// Factory assíncrono com verificação de licença
+  /// Cria (uma única vez) a instância que conversa com o Elgin IDH pelo [channel].
   static Payment create({
     required MethodChannel channel,
   }) {
-    // Se já existe instância e licença validada, retorna ela diretamente
+    // Se já existe instância, retorna ela diretamente
     if (_instance != null) {
       return _instance!;
     }
